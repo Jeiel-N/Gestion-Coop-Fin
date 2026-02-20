@@ -31,8 +31,18 @@ def obtenir_contribution_unitaire():
     return res[0] if res else 10000.0
 
 # CALCUL DES PROCHAINS SAMEDIS
+
 def obtenir_prochains_samedis(nombre):
-    pass
+    samedis = []
+    maintenant = datetime.now()
+    jours_restants = 5 - maintenant.weekday() 
+    if jours_restants <= 0: jours_restants += 7
+    prochain_samedi = maintenant + timedelta(days=jours_restants)
+    for i in range(nombre):
+        date_sam = prochain_samedi + timedelta(weeks=i)
+        samedis.append(date_sam.strftime("%d/%m/%Y"))
+    return samedis
+
 
 # NAVIGATION ENTRE LES ÉCRANS
 def vider_ecran():
