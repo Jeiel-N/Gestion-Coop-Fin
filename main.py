@@ -112,7 +112,15 @@ def ecran_gestion_membres():
     
     #AJOUTER UN MEMBRE
     def add():
-        pass
+        conn = sqlite3.connect(DB_NOM)
+        if conn.execute("SELECT COUNT(*) FROM membres").fetchone()[0] < 12:
+            conn.execute("INSERT INTO membres (nom, date_inscription) VALUES (?, ?)", (nom_e.get(), datetime.now()))
+            conn.commit(); conn.close()
+            messagebox.showinfo("Confirmation", f"Utilisateur {nom_e.get()} ajouté !")
+            ecran_gestion_membres()
+        else:
+            messagebox.showwarning("Limite", "Maximum 12 membres atteint.")
+            conn.close()
     
     tk.Button(f, text="Ajouter", bg="green", fg="white", command=add).grid(row=0, column=2, padx=5)
 
