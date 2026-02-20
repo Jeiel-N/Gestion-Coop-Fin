@@ -25,7 +25,10 @@ def initialiser_bdd():
 
 # GESTION DE LA CONTRIBUTION UNITAIRE
 def obtenir_contribution_unitaire():
-    pass
+    conn = sqlite3.connect(DB_NOM)
+    res = conn.execute("SELECT valeur FROM parametres WHERE cle='contribution'").fetchone()
+    conn.close()
+    return res[0] if res else 10000.0
 
 # CALCUL DES PROCHAINS SAMEDIS
 def obtenir_prochains_samedis(nombre):
