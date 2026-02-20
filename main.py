@@ -46,7 +46,8 @@ def obtenir_prochains_samedis(nombre):
 
 # NAVIGATION ENTRE LES ÉCRANS
 def vider_ecran():
-    pass
+    for widget in frame.winfo_children():
+        widget.destroy()
 
 def maj_menu(role="invite"):
     barre_menu.delete(0, "end")
@@ -66,7 +67,7 @@ def maj_menu(role="invite"):
         menu_admin.add_command(label="Paramètres", command=fenetre_reglages)
     
 
-    barre_menu.add_command(label="A propos", command=messagebox.showinfo("Version", "Version actuelle de l'application : 1.0"))
+    barre_menu.add_command(label="A propos", command=messagebox.showinfo("Version", "Version actuelle de l'application : 2.0"))
 
 # ECRAN D'ACCEUIL
 def ecran_accueil():
