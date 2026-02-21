@@ -130,8 +130,11 @@ def ecran_gestion_membres():
 
     #SUPPRIMER UN MEMBRE
     def suppr():
-        pass
-    tk.Button(frame, text="Supprimer", bg="red", fg="white", command=suppr).pack(pady=5)
+        conn = sqlite3.connect(DB_NOM)
+        conn.execute("DELETE FROM membres WHERE id=?", (id_s.get(),))
+        conn.commit(); conn.close()
+        ecran_gestion_membres()
+    tk.Button(conteneur, text="Supprimer", bg="red", fg="white", command=suppr).pack()
 
 # ECRAN DE GESTION DES ROTATIONS
 def ecran_rotation():
