@@ -186,7 +186,13 @@ def connexion_admin(u, p):
 
 # ECRAN DE RÉGLAGES
 def fenetre_reglages():
-    pass
+    fen = tk.Toplevel(fenetre)
+    fen.title("Réglages")
+    fen.geometry("300x200")
+    tk.Label(fen, text="Montant contribution (FC):").pack(pady=10)
+    entree = tk.Entry(fen)
+    entree.insert(0, str(int(obtenir_contribution_unitaire())))
+    entree.pack()
     
     def sauver():
         pass
