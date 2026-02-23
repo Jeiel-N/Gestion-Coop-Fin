@@ -166,7 +166,12 @@ def ecran_membre():
 
 # GESTION DE COMPTE ADMIN
 def creer_admin(u, p):
-    pass
+    if u and p:
+        conn = sqlite3.connect(DB_NOM)
+        conn.execute("INSERT INTO admin (utilisateur, mot_de_passe) VALUES (?, ?)", (u, p))
+        conn.commit(); conn.close()
+        messagebox.showinfo("Succès", "Compte créé !")
+        ecran_accueil()
 
 def connexion_admin(u, p):
     pass
