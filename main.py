@@ -139,8 +139,19 @@ def ecran_gestion_membres():
 # ECRAN DE GESTION DES ROTATIONS
 def ecran_rotation():
     vider_ecran()
-    pass
-    tk.Button(frame, text="Retour", command=ecran_tableau_bord).pack(pady=10)
+    contrib = obtenir_contribution_unitaire()
+    conn = sqlite3.connect(DB_NOM)
+    membres = conn.execute("SELECT nom FROM membres ORDER BY date_inscription ASC").fetchall()
+    conn.close()
+    
+    if membres:
+        dates = obtenir_prochains_samedis(len(membres))
+        tableau = ttk.Treeview(conteneur, columns=("Date", "Nom", "Montant"), show="headings")
+        tableau.heading("Date", text="Date de Sortie"); tableau.heading("Nom", text="Bénéficiaire"); tableau.heading("Montant", text="Somme (FC)")
+        for i, m in enumerate(membres):
+            tableau.insert("", "end", values=(dates[i], m[0], f"{int(len(membres)*contrib)} FC"))
+        tableau.pack(fill="both", expand=True, padx=20)
+    tk.Button(conteneur, text="Retour", command=ecran_tableau_bord).pack(pady=10)
 
 # ECRAN MEMBRES
 def ecran_membre():
