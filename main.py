@@ -173,8 +173,16 @@ def creer_admin(u, p):
         messagebox.showinfo("Succès", "Compte créé !")
         ecran_accueil()
 
+#Connexion Admin
 def connexion_admin(u, p):
-    pass
+    conn = sqlite3.connect(DB_NOM)
+    res = conn.execute("SELECT * FROM admin WHERE utilisateur=? AND mot_de_passe=?", (u, p)).fetchone()
+    conn.close()
+    if res:
+        maj_menu("admin")
+        ecran_tableau_bord()
+    else:
+        messagebox.showerror("Erreur", "Identifiants incorrects")
 
 # ECRAN DE RÉGLAGES
 def fenetre_reglages():
