@@ -195,7 +195,15 @@ def fenetre_reglages():
     entree.pack()
     
     def sauver():
-        pass
+            val = float(entree.get())
+            conn = sqlite3.connect(DB_NOM)
+            conn.execute("UPDATE parametres SET valeur=? WHERE cle='contribution'", (val,))
+            conn.commit(); conn.close()
+            messagebox.showinfo("Succès", "Mis à jour !")
+            fen.destroy()
+            ecran_tableau_bord()
+
+    tk.Button(fen, text="Sauvegarder", command=sauver).pack(pady=20)
 
 
 # LANCEMENT DE L'APPLICATION
