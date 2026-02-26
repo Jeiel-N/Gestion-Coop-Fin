@@ -67,7 +67,7 @@ def maj_menu(role="invite"):
         menu_admin.add_command(label="Paramètres", command=fenetre_reglages)
     
     def version():
-        messagebox.showinfo("Version", "Version actuelle de l'application : 2.8")
+        messagebox.showinfo("Version", "Version actuelle de l'application : 2.9")
     barre_menu.add_command(label="A propos", command=version)
 
 # ECRAN D'ACCEUIL
