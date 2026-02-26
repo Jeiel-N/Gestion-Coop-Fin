@@ -67,7 +67,7 @@ def maj_menu(role="invite"):
         menu_admin.add_command(label="Paramètres", command=fenetre_reglages)
     
     def version():
-        messagebox.showinfo("Version", "Version actuelle de l'application : 2.9")
+        messagebox.showinfo("Version", "Version actuelle de l'application : 2.10")
     barre_menu.add_command(label="A propos", command=version)
 
 # ECRAN D'ACCEUIL
@@ -151,6 +151,7 @@ def ecran_gestion_membres():
         conn = sqlite3.connect(bdd)
         conn.execute("DELETE FROM membres WHERE id=?", (id_s.get(),))
         conn.commit(); conn.close()
+        messagebox.showinfo(f"L'utilisateur avec l'ID {id_s.get} a été supprimé avec succès")
         ecran_gestion_membres()
     tk.Button(frame, text="Supprimer", bg="red", fg="white", command=suppr).pack()
 
