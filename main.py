@@ -67,7 +67,7 @@ def maj_menu(role="invite"):
         menu_admin.add_command(label="Paramètres", command=fenetre_reglages)
     
 
-    barre_menu.add_command(label="A propos", command=messagebox.showinfo("Version", "Version actuelle de l'application : 2.6"))
+    barre_menu.add_command(label="A propos", command=messagebox.showinfo("Version", "Version actuelle de l'application : 2.8"))
 
 # ECRAN D'ACCEUIL
 def ecran_accueil():
@@ -103,7 +103,7 @@ def ecran_tableau_bord():
     contrib = obtenir_contribution_unitaire()
     tk.Label(frame, text=f"Tableau de bord - Admin", font=("Arial", 18, "bold")).pack(pady=10)
     
-    conn = sqlite3.connect(DB_NOM)
+    conn = sqlite3.connect(bdd)
     membres = conn.execute("SELECT * FROM membres ORDER BY date_inscription ASC").fetchall()
     conn.close()
 
@@ -151,7 +151,7 @@ def ecran_gestion_membres():
         conn.execute("DELETE FROM membres WHERE id=?", (id_s.get(),))
         conn.commit(); conn.close()
         ecran_gestion_membres()
-    tk.Button(conteneur, text="Supprimer", bg="red", fg="white", command=suppr).pack()
+    tk.Button(frame, text="Supprimer", bg="red", fg="white", command=suppr).pack()
 
 # ECRAN DE GESTION DES ROTATIONS
 def ecran_rotation():
@@ -163,23 +163,32 @@ def ecran_rotation():
     
     if membres:
         dates = obtenir_prochains_samedis(len(membres))
-        tableau = ttk.Treeview(conteneur, columns=("Date", "Nom", "Montant"), show="headings")
+        tableau = ttk.Treeview(frame, columns=("Date", "Nom", "Montant"), show="headings")
         tableau.heading("Date", text="Date de Sortie"); tableau.heading("Nom", text="Bénéficiaire"); tableau.heading("Montant", text="Somme (FC)")
         for i, m in enumerate(membres):
             tableau.insert("", "end", values=(dates[i], m[0], f"{int(len(membres)*contrib)} FC"))
         tableau.pack(fill="both", expand=True, padx=20)
-    tk.Button(conteneur, text="Retour", command=ecran_tableau_bord).pack(pady=10)
+    tk.Button(frame, text="Retour", command=ecran_tableau_bord).pack(pady=10)
 
 # ECRAN MEMBRES
 def ecran_membre():
     vider_ecran()
-    pass
+    tk.Label(frame, text="Espace Membre", font=("Arial", 16)).pack(pady=20)
+    tk.Label(frame, text="Entrez votre nom :").pack()
+    nom_e = tk.Entry(frame); nom_e.pack()
     
     def check():
-        pass
+        conn = sqlite3.connect(bdd)
+        m_list = [r[0] for r in conn.execute("SELECT nom FROM membres ORDER BY date_inscription ASC").fetchall()]
+        conn.close()
+        if nom_e.get() in m_list:
+            idx = m_list.index(nom_e.get())
+            date = obtenir_prochains_samedis(len(m_list))[idx]
+            messagebox.showinfo("Infos", f"Votre tour : Samedi {date}\nMontant : {int(len(m_list)*obtenir_contribution_unitaire())} FC")
+        else: messagebox.showerror("Erreur", "Nom introuvable")
         
-    tk.Button(frame, text="Vérifier mon tour", command=check).pack(pady=10)
-    tk.Button(frame, text="Retour", command=ecran_accueil).pack()
+    tk.Button(frame, text="Vérifier mon tour", command=check).pack(pady=20)
+    tk.Button(frame, text="Retour", command=ecran_accueil).pack(pady=10)
 
 # GESTION DE COMPTE ADMIN
 def creer_admin(u, p):
@@ -192,10 +201,12 @@ def creer_admin(u, p):
 
 #Connexion Admin
 def connexion_admin(u, p):
+    global admin_actuel
     conn = sqlite3.connect(bdd)
     res = conn.execute("SELECT * FROM admin WHERE utilisateur=? AND mot_de_passe=?", (u, p)).fetchone()
     conn.close()
     if res:
+        admin_actuel = u
         maj_menu("admin")
         ecran_tableau_bord()
     else:
@@ -203,7 +214,7 @@ def connexion_admin(u, p):
 
 # ECRAN DE RÉGLAGES
 def fenetre_reglages():
-    fen = tk.Toplevel(fenetre)
+    fen = tk.Toplevel(app)
     fen.title("Réglages")
     fen.geometry("300x200")
     tk.Label(fen, text="Montant contribution (FC):").pack(pady=10)
