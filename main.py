@@ -4,14 +4,14 @@ from tkinter import messagebox, ttk
 from datetime import datetime, timedelta
 
 # INIITALISATION DES VARIABLES GLOBALES
-DB_NOM = "tontine_gestion_v2.db"
+bdd = "tontine_gestion_v2.db"
 frame = None
 barre_menu = None
 admin_actuel = None
 
 # BASES DE DONNÉES
 def initialiser_bdd():
-    conn = sqlite3.connect(DB_NOM)
+    conn = sqlite3.connect(bdd)
     curseur = conn.cursor()
     curseur.execute('''CREATE TABLE IF NOT EXISTS admin 
                       (id INTEGER PRIMARY KEY, utilisateur TEXT, mot_de_passe TEXT)''')
@@ -25,7 +25,7 @@ def initialiser_bdd():
 
 # GESTION DE LA CONTRIBUTION UNITAIRE
 def obtenir_contribution_unitaire():
-    conn = sqlite3.connect(DB_NOM)
+    conn = sqlite3.connect(bdd)
     res = conn.execute("SELECT valeur FROM parametres WHERE cle='contribution'").fetchone()
     conn.close()
     return res[0] if res else 10000.0
@@ -74,7 +74,7 @@ def ecran_accueil():
     vider_ecran()
     maj_menu("invite")
     
-    conn = sqlite3.connect(DB_NOM)
+    conn = sqlite3.connect(bdd)
     existe_admin = conn.execute("SELECT * FROM admin").fetchone()
     conn.close()
 
@@ -100,7 +100,24 @@ def ecran_accueil():
 # TABLEAU DE BORD ADMIN
 def ecran_tableau_bord():
     vider_ecran()
-    pass
+    contrib = obtenir_contribution_unitaire()
+    tk.Label(frame, text=f"Tableau de bord - Admin", font=("Arial", 18, "bold")).pack(pady=10)
+    
+    conn = sqlite3.connect(DB_NOM)
+    membres = conn.execute("SELECT * FROM membres ORDER BY date_inscription ASC").fetchall()
+    conn.close()
+
+    nb = len(membres)
+    cadre_resume = tk.LabelFrame(frame, text="Finances", padx=20, pady=10)
+    cadre_resume.pack(fill="x", padx=20)
+    tk.Label(cadre_resume, text=f"Membres : {nb}/12").pack(side="left")
+    tk.Label(cadre_resume, text=f"Total Cagnotte : {int(nb*contrib)} FC", fg="green", font=("bold")).pack(side="right")
+
+    colonnes = ("ID", "Nom", "Date")
+    tableau = ttk.Treeview(frame, columns=colonnes, show="headings")
+    for c in colonnes: tableau.heading(c, text=c)
+    for m in membres: tableau.insert("", "end", values=m)
+    tableau.pack(pady=20, padx=20, fill="both", expand=True)
 
 # ECRAN DE GESTION DES MEMBRES
 def ecran_gestion_membres():
@@ -113,7 +130,7 @@ def ecran_gestion_membres():
     
     #AJOUTER UN MEMBRE
     def add():
-        conn = sqlite3.connect(DB_NOM)
+        conn = sqlite3.connect(bdd)
         if conn.execute("SELECT COUNT(*) FROM membres").fetchone()[0] < 12:
             conn.execute("INSERT INTO membres (nom, date_inscription) VALUES (?, ?)", (nom_e.get(), datetime.now()))
             conn.commit(); conn.close()
@@ -130,7 +147,7 @@ def ecran_gestion_membres():
 
     #SUPPRIMER UN MEMBRE
     def suppr():
-        conn = sqlite3.connect(DB_NOM)
+        conn = sqlite3.connect(bdd)
         conn.execute("DELETE FROM membres WHERE id=?", (id_s.get(),))
         conn.commit(); conn.close()
         ecran_gestion_membres()
@@ -140,7 +157,7 @@ def ecran_gestion_membres():
 def ecran_rotation():
     vider_ecran()
     contrib = obtenir_contribution_unitaire()
-    conn = sqlite3.connect(DB_NOM)
+    conn = sqlite3.connect(bdd)
     membres = conn.execute("SELECT nom FROM membres ORDER BY date_inscription ASC").fetchall()
     conn.close()
     
@@ -167,7 +184,7 @@ def ecran_membre():
 # GESTION DE COMPTE ADMIN
 def creer_admin(u, p):
     if u and p:
-        conn = sqlite3.connect(DB_NOM)
+        conn = sqlite3.connect(bdd)
         conn.execute("INSERT INTO admin (utilisateur, mot_de_passe) VALUES (?, ?)", (u, p))
         conn.commit(); conn.close()
         messagebox.showinfo("Succès", "Compte créé !")
@@ -175,7 +192,7 @@ def creer_admin(u, p):
 
 #Connexion Admin
 def connexion_admin(u, p):
-    conn = sqlite3.connect(DB_NOM)
+    conn = sqlite3.connect(bdd)
     res = conn.execute("SELECT * FROM admin WHERE utilisateur=? AND mot_de_passe=?", (u, p)).fetchone()
     conn.close()
     if res:
@@ -196,7 +213,7 @@ def fenetre_reglages():
     
     def sauver():
             val = float(entree.get())
-            conn = sqlite3.connect(DB_NOM)
+            conn = sqlite3.connect(bdd)
             conn.execute("UPDATE parametres SET valeur=? WHERE cle='contribution'", (val,))
             conn.commit(); conn.close()
             messagebox.showinfo("Succès", "Mis à jour !")
