@@ -66,8 +66,9 @@ def maj_menu(role="invite"):
         menu_admin.add_separator()
         menu_admin.add_command(label="Paramètres", command=fenetre_reglages)
     
-
-    barre_menu.add_command(label="A propos", command=messagebox.showinfo("Version", "Version actuelle de l'application : 2.8"))
+    def version():
+        messagebox.showinfo("Version", "Version actuelle de l'application : 2.8")
+    barre_menu.add_command(label="A propos", command=version)
 
 # ECRAN D'ACCEUIL
 def ecran_accueil():
@@ -86,13 +87,13 @@ def ecran_accueil():
         u_ent = tk.Entry(cadre, width=30); u_ent.insert(0, "Identifiant"); u_ent.pack(pady=5)
         p_ent = tk.Entry(cadre, show="*", width=30); p_ent.pack(pady=5)
         tk.Button(cadre, text="Enregistrer", bg="#2ecc71", 
-                  command=creer_admin(u_ent.get(), p_ent.get())).pack(pady=10)
+                  command=lambda: creer_admin(u_ent.get(), p_ent.get())).pack(pady=10)
     else:
         tk.Label(cadre, text="Connexion Administrateur", font=("Arial", 16, "bold")).pack(pady=10)
         u_ent = tk.Entry(cadre, width=30); u_ent.pack(pady=5)
         p_ent = tk.Entry(cadre, show="*", width=30); p_ent.pack(pady=5)
         tk.Button(cadre, text="Se connecter", bg="#3498db", fg="white", 
-                  command=connexion_admin(u_ent.get(), p_ent.get())).pack(pady=10)
+                  command=lambda: connexion_admin(u_ent.get(), p_ent.get())).pack(pady=10)
         
         tk.Label(cadre, text="---").pack(pady=10)
         tk.Button(cadre, text="Espace Membre", command=ecran_membre).pack()
